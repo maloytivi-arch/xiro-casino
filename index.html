@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#09121f">
+<title>Xiro Casino — Winter Edition</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#09121f;--panel:#111f30;--panel2:#172a3e;--line:#263b50;--text:#edf5ff;--muted:#8ca1b7;--teal:#4bd5c6;--gold:#f3ca75;--purple:#b49aff}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,#16434b 0,transparent 43%),radial-gradient(ellipse at 100% 35%,#252044 0,transparent 35%),var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;padding:0 14px 100px}
+button,input{font:inherit}button{color:inherit;cursor:pointer;border:0}
+button:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+.app{max-width:480px;margin:auto;position:relative;z-index:1}
+.header{display:flex;align-items:center;gap:11px;padding:20px 2px}
+.logo{width:43px;height:43px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(140deg,#38d7c3,#6866ce);font-size:25px;box-shadow:0 5px 24px #3bd8c344}
+.brand{font-size:17px;font-weight:850}.subtitle{font-size:10px;letter-spacing:2px;color:var(--muted)}
+.header-balance{margin-left:auto;display:flex;align-items:center;gap:6px;padding:9px 11px;border:1px solid var(--line);background:#ffffff08;border-radius:13px;font-weight:800}
+.online-badge{display:flex;align-items:center;gap:5px;font-size:11px;color:#57d79a;background:#57d79a15;padding:5px 9px;border-radius:10px;border:1px solid #57d79a30}
+.online-dot{width:6px;height:6px;border-radius:50%;background:#57d79a;animation:pulse 2s infinite}
+@keyframes pulse{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
+.star{width:18px;height:18px;background-image:url('xiro-star.png');background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 0 5px rgba(92,225,211,0.6))}
+.card{background:linear-gradient(145deg,#172a3edb,#101d2ddd);border:1px solid #ffffff12;border-radius:19px;padding:16px;box-shadow:0 12px 30px #00000013}
+.muted{color:var(--muted)}.small{font-size:12px}.section-title{font-size:17px;font-weight:800;margin:23px 2px 12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.stack{display:grid;gap:12px}
+.welcome{padding:21px;background:radial-gradient(ellipse at 100% 0,#46d3c522,transparent 50%),linear-gradient(130deg,#162d41,#18233d);position:relative;overflow:hidden}
+.welcome:after{content:"❄";position:absolute;right:17px;top:12px;font-size:80px;color:#d9f7ff0d}
+.pill{display:inline-block;padding:5px 9px;border:1px solid #4bd5c644;border-radius:30px;color:var(--teal);font-size:10px;letter-spacing:1px;font-weight:800}
+h1{font-size:26px;line-height:1.2;margin:12px 0 8px}h2{font-size:19px;margin:0 0 9px}p{margin:0}
+.balance{font-size:32px;font-weight:900;letter-spacing:-1px;margin:12px 0;display:flex;align-items:center;gap:8px}
+.btn{padding:12px 15px;border-radius:13px;font-weight:800;background:linear-gradient(130deg,#50deca,#36b7b6);color:#09201f;transition:transform .16s,filter .16s}
+.btn:active{transform:scale(.97)}.btn.secondary{background:#ffffff09;border:1px solid var(--line);color:var(--text)}
+.btn.gold{background:linear-gradient(130deg,#ffe2a0,#d7a64e);color:#35250a}
+.btn:disabled{opacity:.5;cursor:not-allowed}.full{width:100%}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.page{display:none;animation:appear .25s ease}.page.active{display:block}
+@keyframes appear{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.bottom-nav{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,480px);display:grid;grid-template-columns:repeat(5,1fr);padding:10px 5px max(10px,env(safe-area-inset-bottom));background:#091321ed;border:1px solid #ffffff12;border-bottom:0;border-radius:19px 19px 0 0;backdrop-filter:blur(20px)}
+.nav-btn{background:transparent;color:#8297ad;display:grid;justify-items:center;gap:3px;font-size:10px;padding:4px 0}
+.nav-btn .ico{font-size:21px}.nav-btn.active{color:var(--teal)}
+.game-catalog{display:grid;gap:12px}
+.game-card{width:100%;min-height:133px;position:relative;overflow:hidden;display:flex;align-items:center;gap:13px;padding:15px;text-align:left;border-radius:20px;border:1px solid #ffffff22;background:#18283d;box-shadow:0 12px 28px #0002;transition:transform .16s}
+.game-card:active{transform:scale(.985)}
+.game-card:before{content:"";position:absolute;inset:0;pointer-events:none}
+.game-slots:before{background:radial-gradient(circle at 85% 20%,#8be9ff77,transparent 35%),linear-gradient(115deg,#132b42,#1d5260 57%,#655094)}
+.game-wheel:before{background:radial-gradient(circle at 85% 15%,#ffe4a866,transparent 38%),linear-gradient(115deg,#352348,#61476d 55%,#15505a)}
+.game-memory:before{background:radial-gradient(circle at 85% 20%,#b4f6ff66,transparent 37%),linear-gradient(115deg,#17354d,#27717a 60%,#26365b)}
+.game-coin:before{background:radial-gradient(circle at 85% 20%,#fff0b866,transparent 36%),linear-gradient(115deg,#40301e,#855c2e 60%,#293b58)}
+.game-chest:before{background:radial-gradient(circle at 85% 20%,#f4b8ff66,transparent 36%),linear-gradient(115deg,#39234f,#70406f 57%,#214858)}
+.game-dice:before{background:radial-gradient(circle at 85% 20%,#9effd966,transparent 38%),linear-gradient(115deg,#153c39,#27716b 57%,#283a62)}
+.game-art{position:relative;z-index:1;flex:0 0 69px;width:69px;height:69px;border-radius:20px;display:grid;place-items:center;font-size:35px;background:#06121b66;border:1px solid #ffffff27;box-shadow:inset 0 1px #ffffff18}
+.game-copy{position:relative;z-index:1;display:grid;gap:5px;flex:1;min-width:0}
+.game-copy strong{font-size:16px;line-height:1.25}.game-copy .desc{font-size:12px;color:#d7e6f4}
+.tag{font-size:9px;font-weight:850;letter-spacing:1.5px;color:#c6fff6}
+.cost{font-size:12px;font-weight:800;display:flex;gap:5px;align-items:center}
+.game-arrow{position:relative;z-index:1;font-size:20px;color:#ffffffa8}
+.nft{min-height:140px;padding:12px;border-radius:16px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;color:white;text-align:left;background:#263a52;border:1px solid #ffffff1e}
+.nft .art{font-size:38px}.nft-name{font-weight:800}.rarity{font-size:10px;text-transform:uppercase;letter-spacing:1px}
+.legendary{background:linear-gradient(135deg,#c6953f,#6f4821)}.epic{background:linear-gradient(135deg,#9b59b6,#49346f)}.rare{background:linear-gradient(135deg,#3498db,#234e83)}
+.inventory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.empty{text-align:center;padding:26px;color:var(--muted)}
+.leader-row{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;padding:13px 9px;border-bottom:1px solid #ffffff0c}
+.leader-row:last-child{border:0}.rank{font-weight:900;color:var(--gold)}
+.avatar{width:58px;height:58px;border-radius:19px;background:linear-gradient(135deg,#4bd5c6,#7168d9);display:grid;place-items:center;font-size:26px;font-weight:900}
+.progress{height:9px;background:#ffffff12;border-radius:20px;overflow:hidden;margin:10px 0}
+.progress div{height:100%;background:linear-gradient(90deg,#4bd5c6,#f3ca75);border-radius:20px;transition:width .3s}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.stat{padding:13px;border:1px solid var(--line);border-radius:14px;background:#ffffff05}.stat strong{display:block;font-size:20px}
+.modal-backdrop{position:fixed;inset:0;z-index:40;background:#02060ddd;display:none;align-items:flex-end;justify-content:center;padding:13px;padding-bottom:max(13px,env(safe-area-inset-bottom))}
+.modal-backdrop.open{display:flex;animation:appear .2s ease}
+.modal{width:min(100%,450px);max-height:88vh;overflow:auto;background:linear-gradient(145deg,#17283c,#0e1929);border:1px solid #ffffff1b;border-radius:23px;padding:19px;box-shadow:0 25px 70px #0008}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}
+.close{width:35px;height:35px;border-radius:12px;background:#ffffff0c;border:1px solid var(--line);font-size:19px}
+.game-panel{padding-top:5px}.reels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:17px 0}
+.reel{height:83px;border-radius:15px;display:grid;place-items:center;font-size:36px;background:#07121f;border:1px solid var(--line)}
+.reel.spinning{animation:shake .12s linear infinite alternate}@keyframes shake{to{transform:translateY(-3px)}}
+.game-note{text-align:center;min-height:23px;margin:10px 0;color:var(--muted);font-size:13px}
+.wheel-wrap{position:relative;width:190px;height:190px;margin:20px auto}
+.wheel{width:190px;height:190px;border-radius:50%;border:7px solid #ffffff44;background:conic-gradient(#f3ca75 0 45deg,#4bd5c6 45deg 90deg,#8562c6 90deg 135deg,#3498db 135deg 180deg,#f3ca75 180deg 225deg,#4bd5c6 225deg 270deg,#8562c6 270deg 315deg,#3498db 315deg);display:grid;place-items:center;font-size:35px;box-shadow:0 0 30px #4bd5c622;transition:transform 4s cubic-bezier(.12,.68,.08,1)}
+.wheel-arrow{position:absolute;top:-14px;left:calc(50% - 11px);z-index:2;border-left:11px solid transparent;border-right:11px solid transparent;border-top:26px solid var(--gold)}
+.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}
+.memory-card{aspect-ratio:1;border-radius:13px;background:linear-gradient(145deg,#18384e,#2c4963);border:1px solid var(--line);font-size:25px}
+.memory-card.opened,.memory-card:disabled{background:linear-gradient(145deg,#276f70,#43557e)}
+.stage{height:110px;display:grid;place-items:center;font-size:67px;margin:9px auto}
+.stage.animate{animation:pop .65s ease}@keyframes pop{50%{transform:scale(1.17) rotate(7deg)}}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);gap:12px}
+.toggle{appearance:none;width:42px;height:25px;background:#35465a;border-radius:20px;position:relative;flex-shrink:0}
+.toggle:before{content:"";position:absolute;width:19px;height:19px;border-radius:50%;background:white;left:3px;top:3px;transition:transform .2s}
+.toggle:checked{background:var(--teal)}.toggle:checked:before{transform:translateX(17px)}
+.toast{position:fixed;z-index:70;left:50%;bottom:95px;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:#1c3044;border:1px solid var(--line);border-radius:13px;padding:12px 16px;transition:.2s;max-width:90%;white-space:nowrap;box-shadow:0 8px 25px #0006}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.snow{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.flake{position:absolute;top:-30px;color:#e2f7ff;animation:fall linear infinite;text-shadow:0 0 8px #b8edff66}
+@keyframes fall{to{transform:translate(var(--drift),110vh) rotate(360deg)}}
+.hidden{display:none!important}
+@media(min-width:500px){body{padding-top:8px}.bottom-nav{bottom:10px;border-bottom:1px solid #ffffff12;border-radius:19px}.modal-backdrop{align-items:center}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="snow" id="snow"></div>
+<main class="app">
+<header class="header">
+  <div class="logo">❄</div>
+  <div><div class="brand">Xiro Casino</div><div class="subtitle">WINTER EDITION</div></div>
+  <div class="online-badge"><div class="online-dot"></div>Онлайн: <span id="onlineCount">1</span></div>
+  <div class="header-balance"><div class="star"></div><span id="headerBalance">550</span></div>
+</header>
+
+<section class="page active" id="page-home">
+  <div class="card welcome">
+    <span class="pill">❄ ЗИМНИЙ СЕЗОН</span>
+    <h1>Добро пожаловать,<br><span id="helloName">Игрок</span>!</h1>
+    <p class="muted">Отдохни, сыграй в мини-игры и собери зимнюю коллекцию.</p>
+    <div class="balance"><div class="star"></div><span id="homeBalance">550</span></div>
+    <div class="row"><button class="btn" data-go="games">Играть сейчас ↗</button><span class="small muted">Виртуальные очки</span></div>
+  </div>
+  <div class="section-title">Твоя статистика</div>
+  <div class="stats">
+    <div class="stat"><span class="muted small">Сыграно игр</span><strong id="gamesPlayed">0</strong></div>
+    <div class="stat"><span class="muted small">Уровень</span><strong id="levelNum">1</strong></div>
+  </div>
+  <div class="section-title">Игры дня</div>
+  <div class="game-catalog">
+    <button class="game-card game-slots" data-open-game="slots"><span class="game-art">🎰</span><span class="game-copy"><span class="tag">WINTER SPECIAL</span><strong>Зимние слоты</strong><span class="desc">Три одинаковых символа — награда!</span><span class="cost"><div class="star" style="width:12px;height:12px;"></div> 50 очков</span></span><span class="game-arrow">›</span></button>
+    <button class="game-card game-wheel" data-open-game="wheel"><span class="game-art">🎡</span><span class="game-copy"><span class="tag">LUCKY SPIN</span><strong>Колесо фортуны</strong><span class="desc">Испытай удачу на колесе.</span><span class="cost"><div class="star" style="width:12px;height:12px;"></div> 50 очков</span></span><span class="game-arrow">›</span></button>
+  </div>
+  <div class="section-title">Коллекция</div>
+  <div class="grid2" id="homeNfts"></div>
+  <button class="btn secondary full" style="margin-top:10px" data-go="inventory">Открыть инвентарь →</button>
+</section>
+
+<section class="page" id="page-inventory">
+  <div class="section-title" style="margin-top:7px">❄ Твой инвентарь</div>
+  <p class="muted small" style="margin:0 2px 15px">Коллекционные предметы зимнего сезона.</p>
+  <div class="inventory-grid" id="inventoryGrid"></div>
+  <div class="empty hidden" id="inventoryEmpty">Пока ничего нет в коллекции.</div>
+</section>
+
+<section class="page" id="page-games">
+  <div class="section-title" style="margin-top:7px">Игровой зал</div>
+  <p class="muted small" style="margin:0 2px 15px">Выбери карточку, чтобы открыть игру.</p>
+  <div class="game-catalog">
+    <button class="game-card game-slots" data-open-game="slots"><span class="game-art">🎰</span><span class="game-copy"><span class="tag">WINTER SPECIAL</span><strong>Зимние слоты</strong><span class="desc">Барабаны, символы и джекпот.</span><span class="cost"><div class="star" style="width:12px;height:12px;"></div> 50 очков</span></span><span class="game-arrow">›</span></button>
+    <button class="game-card game-wheel" data-open-game="wheel"><span class="game-art">🎡</span><span class="game-copy"><span class="tag">LUCKY SPIN</span><strong>Колесо фортуны</strong><span class="desc">Крути колесо и получай очки.</span><span class="cost"><div class="star" style="width:12px;height:12px;"></div> 50 очков</span></span><span class="game-arrow">›</span></button>
+    <button class="game-card game-memory" data-open-game="memory"><span class="game-art">🧠</span><span class="game-copy"><span class="tag">BRAIN GAME</span><strong>Снежная память</strong><span class="desc">Найди все четыре пары символов.</span><span class="cost"><div class="star" style="width:12px;height:12px;"></div> 20 очков</span></span><span class="game-arrow">›</span></button>
+    <button class="game-card game-coin" data-open-game="coin"><span class="game-art">🪙</span><span class="game-copy"><span class="tag">COIN FLIP</span><strong>Орёл или решка</strong><span class="desc">Сделай выбор и проверь удачу.</span><span class="cost"><div class="star" style="width:12px;height:12px;"></div> 25 очков</span></span><span class="game-arrow">›</span></button>
+    <button class="game-card game-chest" data-open-game="chest"><span class="game-art">🎁</span><span class="game-copy"><span class="tag">MYSTERY REWARD</span><strong>Ледяной сундук</strong><span class="desc">Открой сундук с сюрпризом.</span><span class="cost"><div class="star" style="width:12px;height:12px;"></div> 30 очков</span></span><span class="game-arrow">›</span></button>
+    <button class="game-card game-dice" data-open-game="dice"><span class="game-art">🎲</span><span class="game-copy"><span class="tag">DICE CHALLENGE</span><strong>Кубик метели</strong><span class="desc">Выброси четыре или больше.</span><span class="cost"><div class="star" style="width:12px;height:12px;"></div> 25 очков</span></span><span class="game-arrow">›</span></button>
+  </div>
+  <div class="card small muted" style="margin-top:15px">Все игры используют только виртуальные очки. Денежных ставок и денежных выигрышей нет.</div>
+</section>
+
+<section class="page" id="page-top">
+  <div class="section-title" style="margin-top:7px">🏆 Глобальный Топ-1000</div>
+  <div class="card"><div class="row"><div><div class="muted small">Твой результат</div><h2 id="myRankXp" style="margin:5px 0">0 XP</h2></div><span class="pill" id="myRank">#11</span></div></div>
+  <div class="section-title">Лучшие игроки</div>
+  <div class="card" id="leaderboard" style="max-height: 400px; overflow-y: auto; padding: 0;"></div>
+  <div class="sticky-you" id="stickyYou" style="position: sticky; bottom: 0; background: #09121f; padding: 10px; border-top: 1px solid var(--line); display: block;">
+    <div class="leader-row you"><span class="rank">#11</span><span><strong>Ты</strong><div class="muted small">Твоё место</div></span><strong id="stickyXp">0 XP</strong></div>
+  </div>
+  <p class="muted small" style="margin:12px 3px">Демонстрационный рейтинг. Для общего рейтинга нужен сервер.</p>
+</section>
+
+<section class="page" id="page-profile">
+  <div class="section-title" style="margin-top:7px">Твой профиль</div>
+  <div class="card">
+    <div class="row" style="justify-content:flex-start">
+      <div class="avatar" id="avatarLetter">G</div>
+      <div><h2 id="profileName" style="margin:0 0 4px">Guest</h2><div class="muted small" id="profileId">Гостевой профиль</div><span class="pill" style="margin-top:7px">WINTER PLAYER</span></div>
+    </div>
+    <div class="section-title">Прогресс</div>
+    <div class="row"><span class="muted small">Опыт (XP)</span><strong id="profileXp">0 XP</strong></div>
+    <div class="progress"><div id="xpProgress"></div></div>
+    <div class="row"><span class="muted small" id="xpRankNote">Играй, чтобы получать XP.</span><strong id="profileRank">Ур. 1</strong></div>
+  </div>
+  <div class="section-title">Статистика</div>
+  <div class="stats">
+    <div class="stat"><span class="muted small">Баланс</span><strong id="profileBalance">550</strong></div>
+    <div class="stat"><span class="muted small">Всего выиграно</span><strong id="totalWon">0</strong></div>
+    <div class="stat"><span class="muted small">Сыграно игр</span><strong id="profileGames">0</strong></div>
+    <div class="stat"><span class="muted small">Предметов</span><strong id="profileItems">3</strong></div>
+  </div>
+  
+  <div class="section-title">Ежедневный бонус</div>
+  <div class="card">
+    <div class="row"><div><strong>+100 звёзд</strong><div class="muted small">Раз в 24 часа</div></div><button class="btn" id="dailyBonusBtn" style="padding:8px 12px;font-size:12px;">Забрать</button></div>
+  </div>
+
+  <div class="section-title">Батлпасс</div>
+  <div class="card">
+    <div class="row"><div><strong>Сезон 1: Зима</strong><div class="muted small">Осталось 30 дней</div></div><button class="btn secondary" id="battlepassBtn" style="padding:8px 12px;font-size:12px;">Открыть</button></div>
+  </div>
+
+  <div class="section-title">Аккаунт XiroGram</div>
+  <div class="card">
+    <div class="row"><div><strong id="linkStatus">Не привязан</strong><div class="muted small">Связь с аккаунтом</div></div><span id="linkIcon">🔗</span></div>
+    <button class="btn full" style="margin-top:15px" id="linkBtn">Привязать аккаунт</button>
+    <p class="muted small" style="margin-top:10px">Введи свой ID из Хирограма, затем подтверди вход в боте.</p>
+  </div>
+  <div class="section-title">Приложение</div>
+  <div class="stack">
+    <button class="btn secondary full" id="settingsBtn">⚙ Настройки</button>
+    <button class="btn secondary full" id="aboutBtn">ⓘ О проекте</button>
+    <button class="btn secondary full" id="resetBtn">Сбросить демо-прогресс</button>
+  </div>
+</section>
+</main>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-tab="home"><span class="ico">⌂</span>Главная</button>
+  <button class="nav-btn" data-tab="inventory"><span class="ico">🎒</span>Инвентарь</button>
+  <button class="nav-btn" data-tab="games"><span class="ico">🎮</span>Игры</button>
+  <button class="nav-btn" data-tab="top"><span class="ico">🏆</span>Топ</button>
+  <button class="nav-btn" data-tab="profile"><span class="ico">♙</span>Профиль</button>
+</nav>
+
+<!-- Модалки -->
+<div class="modal-backdrop" id="gameModal"><div class="modal"><div class="modal-head"><h2 id="gameModalTitle">Игра</h2><button class="close" data-close="gameModal">×</button></div>
+  <div class="game-panel hidden" id="panel-slots"><p class="muted small">Три одинаковых — награда!</p><div class="reels"><div class="reel" id="reel0">❄️</div><div class="reel" id="reel1">🎁</div><div class="reel" id="reel2">🎄</div></div><div class="game-note" id="slotResult">Готов?</div><button class="btn full" id="spinSlots">Крутить · 50 <div class="star" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></div></button></div>
+  <div class="game-panel hidden" id="panel-wheel"><p class="muted small">Испытай удачу.</p><div class="wheel-wrap"><div class="wheel-arrow"></div><div class="wheel" id="wheel">✦</div></div><div class="game-note" id="wheelResult">Крути!</div><button class="btn full" id="spinWheel">Крутить · 50 <div class="star" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></div></button></div>
+  <div class="game-panel hidden" id="panel-memory"><p class="muted small">Найди пары.</p><div class="memory-grid" id="memoryGrid"></div><div class="game-note" id="memoryResult">Найди 4 пары!</div><button class="btn secondary full" id="memoryReset">Новая игра · 20 <div class="star" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></div></button></div>
+  <div class="game-panel hidden" id="panel-coin"><p class="muted small">Выбери сторону.</p><div class="stage" id="coinStage">🪙</div><div class="grid2"><button class="btn secondary" id="heads">🦅 Орёл</button><button class="btn secondary" id="tails">🌙 Решка</button></div><div class="game-note" id="coinResult">Выбор?</div><button class="btn full" id="flipCoin">Подбросить · 25 <div class="star" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></div></button></div>
+  <div class="game-panel hidden" id="panel-chest"><p class="muted small">В сундуке сюрприз.</p><div class="stage" id="chestStage">🎁</div><div class="game-note" id="chestResult">Что внутри?</div><button class="btn full" id="openChest">Открыть · 30 <div class="star" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></div></button></div>
+  <div class="game-panel hidden" id="panel-dice"><p class="muted small">Выброси 4+.</p><div class="stage" id="diceStage">🎲</div><div class="game-note" id="diceResult">Брось!</div><button class="btn full" id="rollDice">Бросить · 25 <div class="star" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></div></button></div>
+</div></div>
+
+<div class="modal-backdrop" id="nftModal"><div class="modal"><div class="modal-head"><h2 id="nftTitle">Предмет</h2><button class="close" data-close="nftModal">×</button></div><div id="nftBody"></div><div class="stack" style="margin-top:15px"><button class="btn gold full" id="sellNft">Продать за 500 очков</button><button class="btn secondary full" id="giftNft">Подарить</button></div></div></div>
+
+<div class="modal-backdrop" id="settingsModal"><div class="modal"><div class="modal-head"><h2>⚙ Настройки</h2><button class="close" data-close="settingsModal">×</button></div><div class="settings-row"><span><strong>Уведомления</strong></span><input class="toggle" type="checkbox" id="settingNotifications" checked></div><div class="settings-row"><span><strong>Звуки</strong></span><input class="toggle" type="checkbox" id="settingSounds"></div><div class="settings-row"><span><strong>Анимации</strong></span><input class="toggle" type="checkbox" id="settingAnimations" checked></div><button class="btn full" style="margin-top:17px" data-close="settingsModal">Готово</button></div></div>
+
+<div class="modal-backdrop" id="aboutModal"><div class="modal"><div class="modal-head"><h2>❄ Xiro Casino</h2><button class="close" data-close="aboutModal">×</button></div><p>Winter Edition — демо-версия с играми и коллекцией.</p><button class="btn full" style="margin-top:14px" data-close="aboutModal">Закрыть</button></div></div>
+
+<div class="modal-backdrop" id="battlepassModal"><div class="modal"><div class="modal-head"><h2>Батлпасс</h2><button class="close" data-close="battlepassModal">×</button></div><p>Сезон 1: Зима. Выполняй задания и получай награды!</p><div class="progress" style="margin-top:20px;"><div style="width: 20%;"></div></div><p class="muted small" style="margin-top:10px;">Прогресс: 20%</p><button class="btn full" style="margin-top:14px" data-close="battlepassModal">Закрыть</button></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+(() => {
+const KEY='xiro_casino_winter_v1';
+const MAX_XP=320000;
+const START={
+ balance:550,xp:0,games:0,totalWon:0,linked:false,
+ inventory:[
+  {id:'lion',name:'Снежный Лев',rarity:'Легендарный',tier:'legendary',art:'🖼️'},
+  {id:'dragon',name:'Ледяной Дракон',rarity:'Эпический',tier:'epic',art:'🖼️'},
+  {id:'fox',name:'Морозный Лис',rarity:'Редкий',tier:'rare',art:'🖼️'}
+ ],
+ settings:{notifications:true,sounds:false,animations:true}
+};
+const $=id=>document.getElementById(id);
+const tg=window.Telegram?.WebApp;
+const tgUser=tg?.initDataUnsafe?.user;
+const userName=tgUser?.first_name||'Guest';
+const userId=tgUser?.id||null;
+const copy=x=>JSON.parse(JSON.stringify(x));
+
+function load(){
+ try{
+  const s=JSON.parse(localStorage.getItem(KEY));
+  if(!s||typeof s!=='object')return copy(START);
+  return {...copy(START),...s,
+   balance:Math.max(0,Number(s.balance)||0),
+   xp:Math.min(MAX_XP,Math.max(0,Number(s.xp)||0)),
+   games:Math.max(0,Number(s.games)||0),
+   totalWon:Math.max(0,Number(s.totalWon)||0),
+   inventory:Array.isArray(s.inventory)?s.inventory:copy(START.inventory),
+   settings:{...START.settings,...(s.settings||{})}
+  };
+ }catch{return copy(START)}
+}
+let state=load(),selected=null,busy=false,toastTimer=null;
+const fmt=n=>Math.floor(n).toLocaleString('ru-RU');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){console.warn('Storage unavailable',e)}}
+function toast(msg){
+ if(!state.settings.notifications)return;
+ $('toast').textContent=msg;$('toast').classList.add('show');
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2300);
+}
+function showModal(id){$(id).classList.add('open')}
+function hideModal(id){$(id).classList.remove('open')}
+function go(tab){
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+tab));
+ document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+ if(tab==='top')renderTop();
+ window.scrollTo({top:0,behavior:state.settings.animations?'smooth':'auto'});
+}
+function addXp(n){state.xp=Math.min(MAX_XP,state.xp+n)}
+function nftHtml(n){return `<button class="nft ${n.tier}" data-nft="${esc(n.id)}"><span class="art">${n.art}</span><span><span class="rarity">${esc(n.rarity)}</span><br><span class="nft-name">${esc(n.name)}</span></span></button>`}
+function renderInventory(){
+ $('inventoryGrid').innerHTML=state.inventory.map(nftHtml).join('');
+ $('inventoryEmpty').classList.toggle('hidden',state.inventory.length!==0);
+ $('homeNfts').innerHTML=state.inventory.slice(0,2).map(nftHtml).join('')||'<div class="card muted small">Коллекция пуста.</div>';
+ $('profileItems').textContent=state.inventory.length;
+}
+function renderTop(){
+ // Генерируем 1000 фейковых игроков для демонстрации
+ const demo=[];
+ for(let i=1; i<=1000; i++){
+     const score = 320000 - (i * 300);
+     if(score <= 0) break;
+     demo.push({name: 'Игрок ' + i, score: score});
+ }
+ 
+ // Отображаем только первых 100 (для визуала, остальные подгрузятся при скролле)
+ const display = demo.slice(0, 100);
+ $('leaderboard').innerHTML=display.map((p,i)=>`<div class="leader-row"><span class="rank">#${i+1}</span><span><strong>${p.name}</strong><div class="muted small">Зимний рейтинг</div></span><strong>${fmt(p.score)} XP</strong></div>`).join('');
+ 
+ // Обновляем твою позицию
+ $('myRank').textContent='#11'; // Для демо
+ $('myRankXp').textContent=fmt(state.xp)+' XP';
+ $('stickyXp').textContent=fmt(state.xp)+' XP';
+}
+function render(){
+ $('headerBalance').textContent=fmt(state.balance);
+ $('homeBalance').textContent=fmt(state.balance);
+ $('profileBalance').textContent=fmt(state.balance);
+ $('helloName').textContent=userName;
+ $('profileName').textContent=userName;
+ $('avatarLetter').textContent=userName.charAt(0).toUpperCase()||'G';
+ $('profileId').textContent=userId?'Telegram ID: '+userId:'Гостевой профиль';
+ $('gamesPlayed').textContent=fmt(state.games);
+ $('profileGames').textContent=fmt(state.games);
+ $('totalWon').textContent=fmt(state.totalWon);
+ $('levelNum').textContent=String(Math.floor(state.xp/1000)+1);
+ $('profileXp').textContent=fmt(state.xp)+' / '+fmt(MAX_XP)+' XP';
+ $('xpProgress').style.width=Math.min(100,state.xp/MAX_XP*100)+'%';
+ $('xpRankNote').textContent=state.xp>=MAX_XP?'Максимальный уровень!':'До максимума: '+fmt(MAX_XP-state.xp)+' XP';
+ $('profileRank').textContent='Ур. '+(Math.floor(state.xp/1000)+1);
+ 
+ // Проверка привязки
+ const isLinked = localStorage.getItem('xiro_linked') === 'true';
+ const xiroId = localStorage.getItem('xiro_id') || 'Неизвестно';
+ 
+ $('linkStatus').textContent = isLinked ? `Привязан ✅ (ID: ${xiroId})` : 'Не привязан';
+ $('linkBtn').textContent = isLinked ? 'Аккаунт привязан' : 'Привязать аккаунт';
+ $('linkBtn').disabled = isLinked;
+ 
+ renderInventory();save();
+}
+function start(cost){
+ if(busy){toast('Подожди, игра ещё идёт.');return false}
+ if(state.balance<cost){toast('Недостаточно виртуальных очков!');return false}
+ busy=true;state.balance-=cost;state.games++;addXp(10);render();return true;
+}
+function finish(){busy=false;render()}
+function makeSnow(){
+ const symbols=['❄','❅','❆'];
+ for(let i=0;i<26;i++){
+  const el=document.createElement('span');el.className='flake';el.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+  el.style.left=Math.random()*100+'%';el.style.fontSize=(10+Math.random()*14)+'px';
+  el.style.opacity=String(.2+Math.random()*.6);el.style.animationDelay=(-Math.random()*10)+'s';
+  el.style.animationDuration=(5+Math.random()*7)+'s';el.style.setProperty('--drift',(-50+Math.random()*100)+'px');
+  $('snow').appendChild(el);
+ }
+}
+
+// Имитация онлайна
+function updateOnline(){
+    const el = $('onlineCount');
+    if(!el) return;
+    const randomOnline = Math.floor(Math.random() * 5) + 1;
+    el.textContent = randomOnline;
+}
+setInterval(updateOnline, 5000);
+
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>hideModal(b.dataset.close)));
+document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)hideModal(m.id)}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-backdrop.open').forEach(m=>hideModal(m.id))});
+document.querySelectorAll('[data-open-game]').forEach(b=>b.addEventListener('click',()=>{
+ if(busy){toast('Сначала заверши текущий раунд.');return}
+ const key=b.dataset.openGame;
+ document.querySelectorAll('.game-panel').forEach(p=>p.classList.add('hidden'));
+ $('panel-'+key).classList.remove('hidden');
+ $('gameModalTitle').textContent=({slots:'🎰 Зимние слоты',wheel:'🎡 Колесо фортуны',memory:'🧠 Снежная память',coin:'🪙 Орёл или решка',chest:'🎁 Ледяной сундук',dice:'🎲 Кубик метели'})[key];
+ hideModal('gameModal');showModal('gameModal');
+ if(key==='memory')setupMemory(false);
+}));
+document.addEventListener('click',e=>{const b=e.target.closest('[data-nft]');if(b)showNft(b.dataset.nft)});
+function showNft(id){
+ const n=state.inventory.find(x=>x.id===id);if(!n)return;selected=id;
+ $('nftTitle').textContent=n.name;
+ $('nftBody').innerHTML=`<div class="nft ${n.tier}" style="min-height:150px"><span class="art">${n.art}</span><span><span class="rarity">${esc(n.rarity)}</span><br><span class="nft-name">${esc(n.name)}</span></span></div><p class="muted small" style="margin-top:12px">Коллекционный предмет зимней серии.</p>`;
+ showModal('nftModal');
+}
+$('sellNft').addEventListener('click',()=>{
+ const n=state.inventory.find(x=>x.id===selected);if(!n)return;
+ if(!confirm(`Продать «${n.name}» за 500 виртуальных очков?`))return;
+ state.inventory=state.inventory.filter(x=>x.id!==selected);state.balance+=500;state.totalWon+=500;selected=null;
+ hideModal('nftModal');render();toast('Предмет продан: +500 очков.');
+});
+$('giftNft').addEventListener('click',()=>{
+ const n=state.inventory.find(x=>x.id===selected);if(!n)return;
+ const friend=prompt('Введи ID друга:');if(friend===null)return;
+ if(!friend.trim()){toast('ID не указан.');return}
+ if(!confirm(`Удалить «${n.name}» из коллекции в демонстрации подарка?`))return;
+ state.inventory=state.inventory.filter(x=>x.id!==selected);selected=null;hideModal('nftModal');render();toast('Демо-подарок оформлен.');
+});
+$('settingsBtn').addEventListener('click',()=>{
+ $('settingNotifications').checked=state.settings.notifications;
+ $('settingSounds').checked=state.settings.sounds;
+ $('settingAnimations').checked=state.settings.animations;showModal('settingsModal');
+});
+[['settingNotifications','notifications'],['settingSounds','sounds'],['settingAnimations','animations']].forEach(([id,key])=>$(id).addEventListener('change',e=>{
+ state.settings[key]=e.target.checked;save();
+}));
+$('aboutBtn').addEventListener('click',()=>showModal('aboutModal'));
+$('resetBtn').addEventListener('click',()=>{
+ if(!confirm('Сбросить баланс, XP, статистику и коллекцию?'))return;
+ state=copy(START);
+ localStorage.removeItem('xiro_linked');
+ localStorage.removeItem('xiro_id');
+ render();toast('Демо-прогресс сброшен.');
+});
+
+// НОВАЯ ЛОГИКА ПРИВЯЗКИ (Ввод ID и переход в бота)
+$('linkBtn').addEventListener('click', () => {
+    // Запрашиваем ID из Хирограма
+    const xiroId = prompt("Введите ваш ID из Хирограма (например, 1780243223):");
+    
+    if (!xiroId || isNaN(xiroId)) {
+        toast('Неверный ID. Попробуйте еще раз.');
+        return;
+    }
+
+    // Получаем Telegram ID (если в браузере — используем тестовый)
+    const tgId = userId || "999999999"; 
+
+    // Формируем ссылку: link_<tgId>_<xiroId>
+    const url = `https://t.me/CasinoVerify_Bot?start=link_${tgId}_${xiroId}`;
+    
+    // Открываем бота
+    if (tg?.openTelegramLink) {
+        tg.openTelegramLink(url);
+    } else {
+        window.open(url, '_blank', 'noopener');
+    }
+
+    toast('Переход в XiroGram... Подтверди вход в боте!');
+
+    // Имитация (в будущем заменим на реальный сервер)
+    setTimeout(() => {
+        localStorage.setItem('xiro_linked', 'true');
+        localStorage.setItem('xiro_id', xiroId); // Сохраняем введенный ID
+        render();
+        toast('Аккаунт успешно привязан!');
+    }, 3000);
+});
+
+// Ежедневный бонус
+$('dailyBonusBtn').addEventListener('click', () => {
+    const lastClaim = localStorage.getItem('xiro_last_bonus');
+    const now = new Date().getTime();
+    const oneDay = 24 * 60 * 60 * 1000;
+    
+    if (lastClaim && (now - lastClaim) < oneDay) {
+        toast('Бонус уже забран сегодня. Приходи через 24 часа!');
+        return;
+    }
+    
+    state.balance += 100;
+    localStorage.setItem('xiro_last_bonus', now);
+    render();
+    toast('Ежедневный бонус получен: +100 звёзд!');
+});
+
+// Батлпасс
+$('battlepassBtn').addEventListener('click', () => showModal('battlepassModal'));
+
+$('spinSlots').addEventListener('click',()=>{
+ if(!start(50))return;
+ const btn=$('spinSlots');btn.disabled=true;$('slotResult').textContent='Барабаны вращаются…';
+ const symbols=['❄️','⛄','🎁','🎄','💎','7️⃣'];
+ const result=[];
+ [0,1,2].forEach((idx)=>{
+  const el=$('reel'+idx);el.classList.add('spinning');
+  const timer=setInterval(()=>el.textContent=symbols[Math.floor(Math.random()*symbols.length)],70);
+  setTimeout(()=>{
+   clearInterval(timer);el.classList.remove('spinning');
+   result[idx]=symbols[Math.floor(Math.random()*symbols.length)];el.textContent=result[idx];
+   if(idx===2){
+    if(result[0]===result[1]&&result[1]===result[2]){
+     const prize=250;state.balance+=prize;state.totalWon+=prize;
+     $('slotResult').textContent='Три одинаковых! +250 очков 🎉';toast('+250 виртуальных очков!');
+    }else $('slotResult').textContent='В этот раз без награды. Попробуй ещё!';
+    finish();btn.disabled=false;
+   }
+  },[850,1350,1850][idx]);
+ });
+});
+$('spinWheel').addEventListener('click',()=>{
+ if(!start(50))return;
+ const btn=$('spinWheel'),wheel=$('wheel');btn.disabled=true;$('wheelResult').textContent='Колесо вращается…';
+ const sector=Math.floor(Math.random()*8),extra=sector*45+Math.random()*35;
+ const rotation=Number(wheel.dataset.rotation||0)+1800+extra;
+ wheel.style.transform=`rotate(${rotation}deg)`;wheel.dataset.rotation=String(rotation);
+ setTimeout(()=>{
+  if([0,3,6].includes(sector)){
+   const prize=sector===0?150:100;state.balance+=prize;state.totalWon+=prize;
+   $('wheelResult').textContent=`Удача! +${prize} очков ✨`;toast(`+${prize} виртуальных очков!`);
+  }else $('wheelResult').textContent='В этот раз без награды. XP начислен!';
+  finish();btn.disabled=false;
+ },4000);
+});
+let coinSide='heads';
+$('heads').addEventListener('click',()=>{coinSide='heads';$('heads').classList.add('gold');$('tails').classList.remove('gold')});
+$('tails').addEventListener('click',()=>{coinSide='tails';$('tails').classList.add('gold');$('heads').classList.remove('gold')});
+$('flipCoin').addEventListener('click',()=>{
+ if(!start(25))return;
+ const btn=$('flipCoin'),stage=$('coinStage');btn.disabled=true;
+ stage.classList.add('animate');$('coinResult').textContent='Монета в воздухе…';
+ setTimeout(()=>{
+  const result=Math.random()<.5?'heads':'tails';stage.textContent=result==='heads'?'🦅':'🌙';
+  if(result===coinSide){state.balance+=50;state.totalWon+=50;$('coinResult').textContent='Угадал! +50 очков';toast('+50 виртуальных очков!')}
+  else $('coinResult').textContent='Не угадал — попробуй ещё.';
+  stage.classList.remove('animate');finish();btn.disabled=false;
+ },700);
+});
+$('openChest').addEventListener('click',()=>{
+ if(!start(30))return;
+ const btn=$('openChest'),stage=$('chestStage');btn.disabled=true;stage.classList.add('animate');stage.textContent='🔒';$('chestResult').textContent='Открываем сундук…';
+ setTimeout(()=>{
+  const prize=[0,20,40,60,100][Math.floor(Math.random()*5)];stage.textContent=prize?'🎁':'🧊';
+  if(prize){state.balance+=prize;state.totalWon+=prize;$('chestResult').textContent=`Награда: +${prize} очков`;toast(`+${prize} виртуальных очков!`)}
+  else $('chestResult').textContent='Сундук пуст. XP начислен.';
+  stage.classList.remove('animate');finish();btn.disabled=false;
+ },700);
+});
+$('rollDice').addEventListener('click',()=>{
+ if(!start(25))return;
+ const btn=$('rollDice'),stage=$('diceStage');btn.disabled=true;$('diceResult').textContent='Кубик катится…';
+ setTimeout(()=>{
+  const n=1+Math.floor(Math.random()*6);stage.textContent=['⚀','⚁','⚂','⚃','⚄','⚅'][n-1];
+  if(n>=4){state.balance+=50;state.totalWon+=50;$('diceResult').textContent=`Выпало ${n}! +50 очков`;toast('+50 виртуальных очков!')}
+  else $('diceResult').textContent=`Выпало ${n}. Награды нет.`;
+  finish();btn.disabled=false;
+ },650);
+});
+let memory=[],memoryOpened=[],memoryMatched=0,memoryBusy=false;
+function setupMemory(charge){
+ if(busy){toast('Подожди завершения раунда.');return}
+ if(charge&&!start(20))return;
+ if(charge)finish();
+ const icons=['❄️','🎁','🦊','💎','❄️','🎁','🦊','💎'];
+ memory=icons.sort(()=>Math.random()-.5);memoryOpened=[];memoryMatched=0;memoryBusy=false;
+ $('memoryResult').textContent='Найди все четыре пары!';
+ $('memoryGrid').innerHTML=memory.map((_,i)=>`<button class="memory-card" data-memory="${i}" aria-label="Карточка ${i+1}">❔</button>`).join('');
+}
+$('memoryReset').addEventListener('click',()=>setupMemory(true));
+$('memoryGrid').addEventListener('click',e=>{
+ const b=e.target.closest('[data-memory]');
+ if(!b||memoryBusy||b.disabled||b.classList.contains('opened'))return;
+ const i=Number(b.dataset.memory);b.textContent=memory[i];b.classList.add('opened');memoryOpened.push({i,b});
+ if(memoryOpened.length===2){
+  memoryBusy=true;const [a,c]=memoryOpened;
+  setTimeout(()=>{
+   if(memory[a.i]===memory[c.i]){
+    a.b.disabled=true;c.b.disabled=true;memoryMatched+=2;
+   }else{
+    a.b.textContent='❔';c.b.textContent='❔';
+    a.b.classList.remove('opened');c.b.classList.remove('opened');
+   }
+   memoryOpened=[];memoryBusy=false;
+   if(memoryMatched===8){
+    const prize=80;state.balance+=prize;state.totalWon+=prize;
+    $('memoryResult').textContent='Все пары найдены! +80 очков';toast('Снежная память пройдена!');
+    render();
+   }
+  },550);
+ }
+});
+window.addEventListener('storage',e=>{if(e.key===KEY){state=load();render()}});
+makeSnow();render();
+updateOnline();
+if(tg){try{tg.ready();tg.expand();tg.setHeaderColor('#09121f');tg.setBackgroundColor('#09121f')}catch(e){}}
+})();
+</script>
+</body>
+</html>
