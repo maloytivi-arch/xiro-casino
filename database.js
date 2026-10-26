@@ -1,0 +1,12 @@
+const Database = require('better-sqlite3');
+const fs = require('node:fs'); const path = require('node:path');
+fs.mkdirSync(path.join(__dirname,'data'),{recursive:true});
+const db = new Database(path.join(__dirname,'data','xirocasino.db'));
+db.pragma('journal_mode = WAL');
+db.exec(`CREATE TABLE IF NOT EXISTS players(id INTEGER PRIMARY KEY AUTOINCREMENT,nickname TEXT NOT NULL,xp INTEGER NOT NULL DEFAULT 0,coins INTEGER NOT NULL DEFAULT 250,level INTEGER NOT NULL DEFAULT 1,last_daily TEXT,is_banned INTEGER NOT NULL DEFAULT 0,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS promos(code TEXT PRIMARY KEY,xp INTEGER,coins INTEGER,max_uses INTEGER,uses INTEGER DEFAULT 0,active INTEGER DEFAULT 1);
+CREATE TABLE IF NOT EXISTS redemptions(player_id INTEGER,code TEXT,PRIMARY KEY(player_id,code));
+CREATE TABLE IF NOT EXISTS history(id INTEGER PRIMARY KEY AUTOINCREMENT,player_id INTEGER,game_id TEXT,result TEXT,xp_delta INTEGER,coins_delta INTEGER,created_at TEXT DEFAULT CURRENT_TIMESTAMP);`);
+const promo=db.prepare('INSERT OR IGNORE INTO promos(code,xp,coins,max_uses) VALUES(?,?,?,?)');
+promo.run('ICESTART',100,100,15);promo.run('WINTER777',150,250,15);promo.run('FROST50',50,500,15);
+module.exports=db;
